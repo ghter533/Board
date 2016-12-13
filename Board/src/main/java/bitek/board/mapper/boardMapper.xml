@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bitek.board.test.boardDAO"> <!--이 sql 문장과 매핑될 인터페이스의 완전한 경로 -->
+
+	<resultMap id="boardvoMap" type="bitek.board.test.boardVO">
+	</resultMap>
+	
+
+	<select id="login" resultType="bitek.board.user.UserInfoVO">
+		select * from USERINFO where id=#{id} and pwd=#{pwd}
+	</select>
+
+	<insert id="input" parameterType="bitek.board.test.boardVO">
+		insert into
+		board(boardnum,id,title,contents,boarddate)
+		values(boardnum.nextval, #{id}, #{title}, #{contents}, sysdate)
+	</insert>
+
+	<select id="list" resultType="bitek.board.test.boardVO">
+	  select * from(
+	  select t1.*, trunc((rownum-1)/4)+1 page from(
+	  select * from
+      board order by boardnum desc)t1)
+      where page=#{page}
+	</select>
+	
+	<select id="totalCount" resultType="java.lang.Integer">
+		select count(*) from board
+	</select>
+	
+	<select id="boardInfo" parameterType="java.util.Map" statementType="CALLABLE">
+	{CALL BOARDPROC1(
+	#{boardNum, mode=IN},
+	#{boardInfo, jdbcType=CURSOR, mode=OUT, javaType=java.sql.ResultSet, resultMap=boardvoMap}
+	 )}
+	</select>
+	
+	<delete id="delete">
+		delete from board where boardnum=#{boardNum}
+	</delete>
+	
+	<select id="getUpdateInfo" resultType="bitek.board.test.boardVO">
+		select * from board where boardnum=#{boardNum}
+	</select>
+	
+	<update id="update" parameterType="bitek.board.test.boardVO">
+		update board set title=#{title}, contents=#{contents} where boardnum=#{boardNum} 
+	</update>
+
+	<insert id="insert" parameterType="java.util.Map" statementType="CALLABLE">
+		{CALL INSERTPROC
+		(#{title,mode=IN},#{id,mode=IN},#{contents,mode=IN},
+		 #{originfilename,mode=IN}, #{changefilename,mode=IN}
+		)}
+	</insert>
+	
+	<select id="getFileInfo" resultType="bitek.board.file.UploadedFileVO">
+		select * from filetable where filenum=#{fileNum}
+	</select>
+
+
+
+
+
+
+	<select id="titleSearch" resultType="bitek.board.test.boardVO">
+	  select * from(
+	  select t1.*, trunc((rownum-1)/4)+1 page 
+	  from(
+	  select * from
+      board where title like '%' || #{searchVal} || '%')t1
+      )
+      where page=#{page}
+	</select>
+	
+	<select id="idsearch" resultType="bitek.board.test.boardVO">
+		select * from (
+		select t1.*,trunc((rownum-1)/4)+1 page 
+		from(
+		select * from board where id=#{searchVal}
+		)t1
+		)
+		where page=#{page}
+		
+	</select>
+
+	<select id="contentsSearch" resultType="bitek.board.test.boardVO">
+	  select * from(
+	  select t1.*, trunc((rownum-1)/4)+1 page 
+	  from(
+	  select * from
+      board where contents like '%' || #{searchVal} || '%')t1
+      )
+      where page=#{page}
+	</select>
+	
+	
+	
+	
+	
+	<select id="titleRows" resultType="java.lang.Integer">
+		select count(*) from board where title like '%'||#{searchVal}||'%'
+	</select>
+	
+	<select id="contentsRows" resultType="java.lang.Integer">
+		select count(*) from board where contents like '%'||#{searchVal}||'%'
+	</select>
+	
+	<select id="idRows" resultType="java.lang.Integer">
+		select count(*) from board where id=#{searchVal}
+	</select>
+	
+</mapper>
