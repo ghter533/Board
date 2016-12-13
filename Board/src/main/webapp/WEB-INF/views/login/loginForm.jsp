@@ -24,7 +24,7 @@ $(document).ready(function() {
 			//alert(jsonObj.loginOk);
 				if(jsonObj.loginOk){
 				alert(jsonObj.loginOk);
-				alert("성공");
+				alert("성공!!!");
 				location.href="list";
 				}else{
 				alert("ID와 PWD를 다시 한번 확인해주세요");
